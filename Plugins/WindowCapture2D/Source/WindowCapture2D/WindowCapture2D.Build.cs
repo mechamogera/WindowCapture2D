@@ -50,5 +50,17 @@ public class WindowCapture2D : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			bEnableExceptions = true;
+			bUseUnity = false;
+			CppStandard = CppStandardVersion.Cpp17;
+			PublicSystemLibraries.AddRange(new string[] { "shlwapi.lib", "runtimeobject.lib", "D3D11.lib" });
+			PrivateIncludePaths.Add(System.IO.Path.Combine(Target.WindowsPlatform.WindowsSdkDir,
+														"Include",
+														Target.WindowsPlatform.WindowsSdkVersion,
+														"cppwinrt"));
+		}
 	}
 }

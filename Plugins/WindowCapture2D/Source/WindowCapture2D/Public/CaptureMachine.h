@@ -12,6 +12,30 @@ using HBITMAP = void*;
 using HDC = void*;
 using HWND = void*;
 #endif
+
+#if PLATFORM_WINDOWS
+#include "Windows/AllowWindowsPlatformTypes.h"
+#include "Windows/AllowWindowsPlatformAtomics.h"
+#include "Windows/PreWindowsApi.h"
+
+#include <unknwn.h>
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.Perception.Spatial.h>
+#include <winrt/Windows.System.h>
+#include <winrt/Windows.Graphics.h>
+#include <winrt/Windows.Graphics.Capture.h>
+#include <winrt/Windows.Graphics.DirectX.h>
+#include <winrt/Windows.Graphics.DirectX.Direct3D11.h>
+#include <d3d11.h>
+#include <windows.graphics.capture.interop.h>
+#include <windows.graphics.directx.direct3d11.interop.h>
+
+#include "Windows/PostWindowsApi.h"
+#include "Windows/HideWindowsPlatformAtomics.h"
+#include "Windows/HideWindowsPlatformTypes.h"
+#endif
 #include "CaptureMachine.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCaptureMachineChangeTexture, UTexture2D*, NewTexture);
@@ -33,10 +57,14 @@ public:
 
 protected:
 	bool FindTargetWindow(HWND hWnd);
-	void UpdateTexture();
-	void GetWindowSize(HWND hWnd);
 	void ReCreateTexture();
-	bool DoCapture();
+
+#if PLATFORM_WINDOWS
+	winrt::Windows::Graphics::Capture::GraphicsCaptureItem CreateCaptureItem(HWND hwnd);
+	winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice CreateDevice();
+	void OnFrameArrived(winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool const& sender, winrt::Windows::Foundation::IInspectable const& args);
+	void UpdateTextureFromID3D11Texture2D(winrt::com_ptr<ID3D11Texture2D> texture);
+#endif
 
 
 public:
@@ -50,18 +78,21 @@ public:
 	FCaptureMachineChangeTexture ChangeTexture;
 
 private:
-	char* m_BitmapBuffer = nullptr;
-
-	HBITMAP m_hBmp = nullptr;
-	HDC m_MemDC = nullptr;
-	HBITMAP m_hOriginalBmp = nullptr;
-	HDC m_OriginalMemDC = nullptr;
-	HWND m_TargetWindow = nullptr;
-
 	FIntVector2D m_WindowSize;
 	FIntVector2D m_OriginalWindowSize;
 	FIntVector2D m_WindowOffset;
 
-	class FWCWorkerThread* CaptureWorkerThread = nullptr;
-	class FRunnableThread* CaptureThread = nullptr;
+#if PLATFORM_WINDOWS
+	HWND m_TargetWindow = nullptr;
+
+	winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice m_WinrtDevice = nullptr;
+	winrt::Windows::Graphics::Capture::GraphicsCaptureItem m_WinrtItem = nullptr;
+	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool m_WinrtFramePool = nullptr;
+	winrt::Windows::Graphics::Capture::GraphicsCaptureSession m_WinrtSession = nullptr;
+	winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool::FrameArrived_revoker m_WinrtRevoker;
+	winrt::Windows::Graphics::SizeInt32 m_WinrtSize = { 0, 0 };
+	winrt::com_ptr<ID3D11Texture2D> m_WinrtTexture = nullptr;
+	UINT m_Width = 0;
+	UINT m_Height = 0;
+#endif
 };
