@@ -263,8 +263,8 @@ void UCaptureMachine::UpdateTextureFromID3D11Texture2D(winrt::com_ptr<ID3D11Text
 
 		if (!m_WinrtTexture) return;
 
-		UINT Width = mapInfo.RowPitch / 4;
-		UINT Height = mapInfo.DepthPitch / mapInfo.RowPitch;
+		UINT Width = desc.Width;
+		UINT Height = desc.Height;
 
 		if ((m_Width != Width) ||
 			(m_Height != Height))
@@ -275,7 +275,7 @@ void UCaptureMachine::UpdateTextureFromID3D11Texture2D(winrt::com_ptr<ID3D11Text
 		}
 
 		auto Region = new FUpdateTextureRegion2D(0, 0, 0, 0, m_Width, m_Height);
-		TextureTarget->UpdateTextureRegions(0, 1, Region, 4 * m_Width, 4, (uint8*)mapInfo.pData);
+		TextureTarget->UpdateTextureRegions(0, 1, Region, mapInfo.RowPitch, 4, (uint8*)mapInfo.pData);
 	}
 	catch (const winrt::hresult_error& e)
 	{
