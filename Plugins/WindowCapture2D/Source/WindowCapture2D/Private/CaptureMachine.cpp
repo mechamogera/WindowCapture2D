@@ -38,6 +38,8 @@ void UCaptureMachine::Start()
 			UE_LOG(LogTemp, Error, TEXT("Failed to CreateCaptureItem()"));
 			return;
 		}
+		m_WinrtItem.Closed({ this, &UCaptureMachine::OnTargetClosed });
+
 		m_WinrtDevice = CreateDevice();
 		if (!m_WinrtDevice)
 		{
@@ -119,6 +121,12 @@ bool UCaptureMachine::Tick(float deltaTime)
 }
 
 #if PLATFORM_WINDOWS
+void UCaptureMachine::OnTargetClosed(winrt::Windows::Graphics::Capture::GraphicsCaptureItem Item, winrt::Windows::Foundation::IInspectable Inspectable)
+{
+	ChangeTexture.Broadcast(nullptr);
+}
+
+
 winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice UCaptureMachine::CreateDevice()
 {
 	try

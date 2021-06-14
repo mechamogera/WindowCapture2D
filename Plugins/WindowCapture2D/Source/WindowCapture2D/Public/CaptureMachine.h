@@ -66,6 +66,7 @@ protected:
 	winrt::Windows::Graphics::Capture::GraphicsCaptureItem CreateCaptureItem(HWND hwnd);
 	winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice CreateDevice();
 	void OnFrameArrived(winrt::Windows::Graphics::Capture::Direct3D11CaptureFramePool const& sender, winrt::Windows::Foundation::IInspectable const& args);
+	void OnTargetClosed(winrt::Windows::Graphics::Capture::GraphicsCaptureItem Item, winrt::Windows::Foundation::IInspectable Inspectable);
 	void UpdateTextureFromID3D11Texture2D(winrt::com_ptr<ID3D11Texture2D> texture);
 #endif
 
