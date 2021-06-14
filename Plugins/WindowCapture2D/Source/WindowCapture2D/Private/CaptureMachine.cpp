@@ -52,9 +52,16 @@ void UCaptureMachine::Start()
 			2,
 			m_WinrtItem.Size());
 
-		m_WinrtRevoker = m_WinrtFramePool.FrameArrived(winrt::auto_revoke, { this, &UCaptureMachine::OnFrameArrived });
 		m_WinrtSession = m_WinrtFramePool.CreateCaptureSession(m_WinrtItem);
 		m_WinrtSession.StartCapture();
+
+		if (TickHandle.IsValid())
+		{
+			FTicker::GetCoreTicker().RemoveTicker(TickHandle);
+			TickHandle.Reset();
+		}
+		TickDelegate = FTickerDelegate::CreateUObject(this, &UCaptureMachine::Tick);
+		TickHandle = FTicker::GetCoreTicker().AddTicker(TickDelegate, 1.0f / (float)Properties.FrameRate);
 	}
 	catch (const winrt::hresult_error& e)
 	{
@@ -68,6 +75,12 @@ void UCaptureMachine::Start()
 void UCaptureMachine::Close()
 {
 #if PLATFORM_WINDOWS
+	if (TickHandle.IsValid())
+	{
+		FTicker::GetCoreTicker().RemoveTicker(TickHandle);
+		TickHandle.Reset();
+	}
+
 	if (TextureTarget)
 	{
 		TextureTarget->ReleaseResource();
@@ -95,6 +108,14 @@ void UCaptureMachine::Close()
 	m_WinrtItem = nullptr;
 #endif
 
+}
+
+bool UCaptureMachine::Tick(float deltaTime)
+{
+#if PLATFORM_WINDOWS
+	OnFrameArrived(m_WinrtFramePool, nullptr);
+#endif
+	return true;
 }
 
 #if PLATFORM_WINDOWS
@@ -285,7 +306,6 @@ void UCaptureMachine::UpdateTextureFromID3D11Texture2D(winrt::com_ptr<ID3D11Text
 	}
 }
 #endif
-
 
 UTexture2D* UCaptureMachine::CreateTexture()
 {

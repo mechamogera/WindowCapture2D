@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "CaptureMachineProperties.h"
+#include "Containers/Ticker.h"
+
 #if PLATFORM_WINDOWS
 #include "Windows/WindowsHWrapper.h"
 #include <WinUser.h>
@@ -58,6 +60,7 @@ public:
 protected:
 	bool FindTargetWindow(HWND hWnd);
 	void ReCreateTexture();
+	bool Tick(float deltaTime);
 
 #if PLATFORM_WINDOWS
 	winrt::Windows::Graphics::Capture::GraphicsCaptureItem CreateCaptureItem(HWND hwnd);
@@ -81,6 +84,9 @@ private:
 	FIntVector2D m_WindowSize;
 	FIntVector2D m_OriginalWindowSize;
 	FIntVector2D m_WindowOffset;
+
+	FTickerDelegate TickDelegate;
+	FDelegateHandle TickHandle;
 
 #if PLATFORM_WINDOWS
 	HWND m_TargetWindow = nullptr;
