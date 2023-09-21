@@ -87,7 +87,11 @@ private:
 	FIntVector2D m_WindowOffset;
 
 	FTickerDelegate TickDelegate;
+#if ENGINE_MAJOR_VERSION >= 5
+	FTSTicker::FDelegateHandle TickHandle;
+#else
 	FDelegateHandle TickHandle;
+#endif
 
 #if PLATFORM_WINDOWS
 	HWND m_TargetWindow = nullptr;

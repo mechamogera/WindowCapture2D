@@ -11,6 +11,10 @@
 #include <dwmapi.h>
 #endif
 
+#if ENGINE_MAJOR_VERSION >= 5
+#define FTicker FTSTicker
+#endif
+
 UCaptureMachine::UCaptureMachine()
 {
 }
