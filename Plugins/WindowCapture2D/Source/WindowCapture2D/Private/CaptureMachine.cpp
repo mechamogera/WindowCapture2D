@@ -386,3 +386,29 @@ void UCaptureMachine::ReCreateTexture()
 	TextureTarget->UpdateResource();
 #endif
 }
+
+FWindowStatus UCaptureMachine::GetCurrentWindowStatus()
+{
+	FWindowStatus status;
+	if (!m_TargetWindow) return status;
+
+	__wchar_t windowTitle[1024];
+	GetWindowText(m_TargetWindow, windowTitle, 1024);
+	FString title(windowTitle);
+
+	RECT rect;
+	::GetWindowRect(m_TargetWindow, &rect);
+
+	LONG_PTR style = GetWindowLongPtr(m_TargetWindow, GWL_STYLE);
+	UE_LOG(LogTemp, Log, TEXT("%s"), windowTitle);
+	UE_LOG(LogTemp, Log, TEXT("top=%d"), rect.top);
+	UE_LOG(LogTemp, Log, TEXT("bottom=%d"), rect.bottom);
+	UE_LOG(LogTemp, Log, TEXT("left=%d"), rect.left);
+	UE_LOG(LogTemp, Log, TEXT("right=%d"), rect.right);
+	status.title = title;
+	status.top = rect.top;
+	status.bottom = rect.bottom;
+	status.left = rect.left;
+	status.right = rect.right;
+	return status;
+}

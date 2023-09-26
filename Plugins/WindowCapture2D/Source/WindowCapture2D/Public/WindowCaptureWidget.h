@@ -27,6 +27,8 @@ protected:
 	UFUNCTION()
 	void OnChangeTexture(UTexture2D* NewTexture);
 
+	UFUNCTION(BlueprintPure, Category = WindowCapture2D)
+	FWindowStatus GetCurrentWindowStatus();
 public:	
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 

@@ -43,3 +43,14 @@ void UWindowCaptureWidget::OnChangeTexture(UTexture2D* _NewTexture)
 {
 	ChangeTexture.Broadcast(_NewTexture);
 }
+
+FWindowStatus UWindowCaptureWidget::GetCurrentWindowStatus()
+{
+	if (CaptureMachine)
+	{
+		return CaptureMachine->GetCurrentWindowStatus();
+	}
+
+	FWindowStatus Status;
+	return Status;
+}

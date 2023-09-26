@@ -33,7 +33,6 @@ using HWND = void*;
 #include <d3d11.h>
 #include <windows.graphics.capture.interop.h>
 #include <windows.graphics.directx.direct3d11.interop.h>
-
 #include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformAtomics.h"
 #include "Windows/HideWindowsPlatformTypes.h"
@@ -42,6 +41,23 @@ using HWND = void*;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCaptureMachineChangeTexture, UTexture2D*, NewTexture);
 
+USTRUCT(BlueprintType)
+struct FWindowStatus {
+
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = WindowCapture2D)
+	FString title;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = WindowCapture2D)
+	int top;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = WindowCapture2D)
+	int bottom;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = WindowCapture2D)
+	int left;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = WindowCapture2D)
+	int right;
+};
 
 UCLASS(BlueprintType, Blueprintable)
 class WINDOWCAPTURE2D_API UCaptureMachine : public UObject
@@ -56,6 +72,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = WindowCapture2D)
 	UTexture2D* CreateTexture();
+
+	FWindowStatus GetCurrentWindowStatus();
 
 protected:
 	bool FindTargetWindow(HWND hWnd);

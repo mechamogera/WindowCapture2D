@@ -53,7 +53,7 @@ public class WindowCapture2D : ModuleRules
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
-			bEnableExceptions = true;
+            bEnableExceptions = true;
 			bUseUnity = false;
 			CppStandard = CppStandardVersion.Cpp17;
 			PublicSystemLibraries.AddRange(new string[] { "shlwapi.lib", "runtimeobject.lib", "D3D11.lib" });
@@ -61,6 +61,10 @@ public class WindowCapture2D : ModuleRules
 														"Include",
 														Target.WindowsPlatform.WindowsSdkVersion,
 														"cppwinrt"));
-		}
+            PublicDefinitions.Remove("WINVER=0x0601");
+            PublicDefinitions.Remove("_WIN32_WINNT=0x0601");
+            PublicDefinitions.Add("WINVER=0x0602");
+            PublicDefinitions.Add("_WIN32_WINNT=0x0602");
+        }
 	}
 }
