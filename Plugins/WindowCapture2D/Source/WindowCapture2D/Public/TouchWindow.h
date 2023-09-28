@@ -14,19 +14,26 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "TouchWidnow.generated.h"
+#include "TouchWindow.generated.h"
 
 /**
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
-class WINDOWCAPTURE2D_API UTouchWidnow : public UObject
+class WINDOWCAPTURE2D_API UTouchWindow : public UObject
 {
 	GENERATED_BODY()
 
+public: 
+	static FString DebugInfo(POINTER_TOUCH_INFO info);
+
 public:
-	UFUNCTION(BlueprintCallable)
-	bool Initialize();
+	DECLARE_MULTICAST_DELEGATE(FOnUpdateDelegate);
+
+	FOnUpdateDelegate OnUpdateDelegate;
+
+public:
+	void Initialize(int Id);
 
 	UFUNCTION(BlueprintCallable)
 	void TouchDown(int x, int y);
@@ -36,6 +43,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void TouchRelease(int x, int y);
+
+	bool ShouldUpdate();
+
+	POINTER_TOUCH_INFO GetTouchInfo() { return TouchInfo; }
 
 private:
 	enum State
@@ -58,8 +69,8 @@ private:
 	};
 
 private:
-	bool InjectTouch(StateDetail StateDatail, int x, int y);
-	bool UpdateState(State NewState, int x, int y);
+	void SetTouchInfo(StateDetail StateDatail, int x, int y);
+	void UpdateState(State NewState, int x, int y);
 
 private:
 	State CurrentState = State::Release;
