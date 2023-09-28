@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TouchWindowManager.h"
+#include "TouchManager.h"
 
-bool UTouchWindowManager::Initialize(int TouchNum)
+bool UTouchManager::Initialize(int TouchNum)
 {
 	Touches.Empty();
 
 	for (int i = 0; i < TouchNum; i++)
 	{
-		UTouchWindow* Obj = NewObject<UTouchWindow>();
+		UTouch* Obj = NewObject<UTouch>();
 		Obj->Initialize(i);
-		Obj->OnUpdateDelegate.AddUObject(this, &UTouchWindowManager::Update);
+		Obj->OnUpdateDelegate.AddUObject(this, &UTouchManager::Update);
 		Touches.Add(Obj);
 	}
 
@@ -24,12 +24,12 @@ bool UTouchWindowManager::Initialize(int TouchNum)
 	return true;
 }
 
-UTouchWindow* UTouchWindowManager::GetTouch(int Index)
+UTouch* UTouchManager::GetTouch(int Index)
 {
 	return Touches[Index];
 }
 
-void UTouchWindowManager::Update()
+void UTouchManager::Update()
 {
 	TArray<POINTER_TOUCH_INFO> Infos;
 	for (auto& Touch : Touches)
@@ -48,7 +48,7 @@ void UTouchWindowManager::Update()
 	}*/
 }
 
-void UTouchWindowManager::InjectTouch(UINT32 count, const POINTER_TOUCH_INFO* info)
+void UTouchManager::InjectTouch(UINT32 count, const POINTER_TOUCH_INFO* info)
 {
 	BOOL Result = ::InjectTouchInput(count, info);
 	if (!Result)
@@ -56,7 +56,7 @@ void UTouchWindowManager::InjectTouch(UINT32 count, const POINTER_TOUCH_INFO* in
 		UE_LOG(LogTemp, Warning, TEXT("FailedtoInject: %d %d"), Result, ::GetLastError());
 		for (UINT32 i = 0; i < count; i++)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *UTouchWindow::DebugInfo(info[i]));
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *UTouch::DebugInfo(info[i]));
 		}
 
 	}

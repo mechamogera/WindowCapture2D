@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "TouchWindow.h"
-#include "TouchWindowManager.generated.h"
+#include "Touch.h"
+#include "TouchManager.generated.h"
 
 /**
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
-class WINDOWCAPTURE2D_API UTouchWindowManager : public UObject
+class WINDOWCAPTURE2D_API UTouchManager : public UObject
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ public:
 	bool Initialize(int TouchNum = 1);
 
 	UFUNCTION(BlueprintPure)
-	UTouchWindow* GetTouch(int Index);
+	UTouch* GetTouch(int Index);
 
 private:
 	void Update();
@@ -29,5 +29,5 @@ private:
 
 private:
 	UPROPERTY(Transient)
-	TArray<UTouchWindow*> Touches;
+	TArray<UTouch*> Touches;
 };

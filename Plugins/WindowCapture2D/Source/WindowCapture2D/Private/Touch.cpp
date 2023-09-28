@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TouchWindow.h"
+#include "Touch.h"
 
-FString UTouchWindow::DebugInfo(POINTER_TOUCH_INFO info)
+FString UTouch::DebugInfo(POINTER_TOUCH_INFO info)
 {
 	FString Flag;
 	switch (static_cast<StateDetail>(info.pointerInfo.pointerFlags))
@@ -66,7 +66,7 @@ FString UTouchWindow::DebugInfo(POINTER_TOUCH_INFO info)
 	return InfoStr;
 }
 
-void UTouchWindow::Initialize(int Id)
+void UTouch::Initialize(int Id)
 {
 	TouchInfo.pointerInfo.pointerType = PT_TOUCH;
 	TouchInfo.pointerInfo.pointerId = Id;
@@ -77,27 +77,27 @@ void UTouchWindow::Initialize(int Id)
 	SetTouchInfo(StateDetail::None, 100, 100);
 }
 
-void UTouchWindow::TouchDown(int x, int y)
+void UTouch::TouchDown(int x, int y)
 {
 	UpdateState(State::Touch, x, y);
 }
 
-void UTouchWindow::TouchHover(int x, int y)
+void UTouch::TouchHover(int x, int y)
 {
 	UpdateState(State::Hover, x, y);
 }
 
-void UTouchWindow::TouchRelease(int x, int y)
+void UTouch::TouchRelease(int x, int y)
 {
 	UpdateState(State::Release, x, y);
 }
 
-bool UTouchWindow::ShouldUpdate()
+bool UTouch::ShouldUpdate()
 {
 	return static_cast<StateDetail>(TouchInfo.pointerInfo.pointerFlags) != StateDetail::None;
 }
 
-void UTouchWindow::SetTouchInfo(StateDetail StateDatail, int x, int y)
+void UTouch::SetTouchInfo(StateDetail StateDatail, int x, int y)
 {
 	TouchInfo.pointerInfo.pointerFlags = static_cast<POINTER_FLAGS>(StateDatail);
 	TouchInfo.pointerInfo.ptPixelLocation.x = x;
@@ -108,7 +108,7 @@ void UTouchWindow::SetTouchInfo(StateDetail StateDatail, int x, int y)
 	TouchInfo.rcContact.bottom = y + Marge;
 }
 
-void UTouchWindow::UpdateState(State NewState, int x, int y)
+void UTouch::UpdateState(State NewState, int x, int y)
 {
 	if (NewState == CurrentState)
 	{

@@ -14,13 +14,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "TouchWindow.generated.h"
+#include "Touch.generated.h"
 
 /**
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
-class WINDOWCAPTURE2D_API UTouchWindow : public UObject
+class WINDOWCAPTURE2D_API UTouch : public UObject
 {
 	GENERATED_BODY()
 
