@@ -40,23 +40,13 @@ void UTouchManager::Update()
 		}
 	}
 
-	InjectTouch(Infos.Num(), Infos.GetData());
-	/*BOOL Result = ::InjectTouchInput(Infos.Num(), Infos.GetData());
+	BOOL Result = ::InjectTouchInput(Infos.Num(), Infos.GetData());
 	if (!Result)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("FailedtoInject: %d %d"), Result, ::GetLastError());
-	}*/
-}
-
-void UTouchManager::InjectTouch(UINT32 count, const POINTER_TOUCH_INFO* info)
-{
-	BOOL Result = ::InjectTouchInput(count, info);
-	if (!Result)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("FailedtoInject: %d %d"), Result, ::GetLastError());
-		for (UINT32 i = 0; i < count; i++)
+		for (int32 i = 0; i < Infos.Num(); i++)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *UTouch::DebugInfo(info[i]));
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *UTouch::DebugInfo(Infos[i]));
 		}
 
 	}

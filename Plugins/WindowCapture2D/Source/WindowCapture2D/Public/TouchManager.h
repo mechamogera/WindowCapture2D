@@ -25,8 +25,6 @@ public:
 private:
 	void Update();
 
-	void InjectTouch(UINT32 count, const POINTER_TOUCH_INFO* info);
-
 private:
 	UPROPERTY(Transient)
 	TArray<UTouch*> Touches;
