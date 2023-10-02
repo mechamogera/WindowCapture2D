@@ -29,6 +29,9 @@ protected:
 
 	UFUNCTION(BlueprintPure, Category = WindowCapture2D)
 	FWindowStatus GetCurrentWindowStatus();
+
+	UFUNCTION(BlueprintCallable, Category = WindowCapture2D)
+	void SetActiveWindow();
 public:	
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 

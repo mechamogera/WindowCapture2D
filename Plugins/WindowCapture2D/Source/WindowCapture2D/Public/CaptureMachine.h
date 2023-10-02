@@ -75,6 +75,8 @@ public:
 
 	FWindowStatus GetCurrentWindowStatus();
 
+	void SetActiveWindow();
+
 protected:
 	bool FindTargetWindow(HWND hWnd);
 	void ReCreateTexture();

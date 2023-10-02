@@ -416,3 +416,13 @@ FWindowStatus UCaptureMachine::GetCurrentWindowStatus()
 	status.right = rect.right;
 	return status;
 }
+
+void UCaptureMachine::SetActiveWindow()
+{
+	if (m_TargetWindow)
+	{
+		ShowWindow(m_TargetWindow, SW_RESTORE);
+		ShowWindow(m_TargetWindow, SW_SHOW);
+		SetForegroundWindow(m_TargetWindow);
+	}
+}

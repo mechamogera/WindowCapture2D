@@ -54,3 +54,11 @@ FWindowStatus UWindowCaptureWidget::GetCurrentWindowStatus()
 	FWindowStatus Status;
 	return Status;
 }
+
+void UWindowCaptureWidget::SetActiveWindow()
+{
+	if (CaptureMachine)
+	{
+		CaptureMachine->SetActiveWindow();
+	}
+}
