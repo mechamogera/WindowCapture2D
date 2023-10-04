@@ -2,6 +2,7 @@
 
 
 #include "TouchManager.h"
+#include "WindowCapture2DLog.h"
 
 bool UTouchManager::Initialize(int TouchNum)
 {
@@ -18,7 +19,7 @@ bool UTouchManager::Initialize(int TouchNum)
 	BOOL InitRes = ::InitializeTouchInjection(TouchNum, POINTER_FEEDBACK_DEFAULT);
 	if (!InitRes)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InitFailed: %d %d"), InitRes, ::GetLastError());
+		UE_WC2D_LOG(Error, TEXT("InitFailed: %d %d"), InitRes, ::GetLastError());
 		return false;
 	}
 	return true;
@@ -43,7 +44,7 @@ void UTouchManager::Update()
 	BOOL Result = ::InjectTouchInput(Infos.Num(), Infos.GetData());
 	if (!Result)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("FailedtoInject: %d %d"), Result, ::GetLastError());
+		UE_WC2D_LOG(Error, TEXT("FailedtoInject: %d %d"), Result, ::GetLastError());
 		for (int32 i = 0; i < Infos.Num(); i++)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("%s"), *UTouch::DebugInfo(Infos[i]));

@@ -6,6 +6,7 @@
 #include "Internationalization/Regex.h"
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
 #include "../Private/Utils/WCWorkerThread.h"
+#include "WindowCapture2DLog.h"
 
 #if PLATFORM_WINDOWS
 #include <dwmapi.h>
@@ -61,7 +62,7 @@ void UCaptureMachine::Start()
 				}, reinterpret_cast<LPARAM>(&EnumData));
 			if (!m_TargetMonitor)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Failed to find montior: %d"), EnumData.index);
+				UE_WC2D_LOG(Error, TEXT("Failed to find montior: %d"), EnumData.index);
 				return;
 			}
 		}
@@ -69,7 +70,7 @@ void UCaptureMachine::Start()
 		m_WinrtItem = CreateCaptureItem();
 		if (!m_WinrtItem)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to CreateCaptureItem()"));
+			UE_WC2D_LOG(Error, TEXT("Failed to CreateCaptureItem()"));
 			return;
 		}
 		m_WinrtItem.Closed({ this, &UCaptureMachine::OnTargetClosed });
@@ -77,7 +78,7 @@ void UCaptureMachine::Start()
 		m_WinrtDevice = CreateDevice();
 		if (!m_WinrtDevice)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to CreateDevice()"));
+			UE_WC2D_LOG(Error, TEXT("Failed to CreateDevice()"));
 			return;
 		}
 
@@ -103,7 +104,7 @@ void UCaptureMachine::Start()
 	{
 		const int code = e.code();
 		const winrt::hstring message = e.message();
-		UE_LOG(LogTemp, Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
+		UE_WC2D_LOG(Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
 	}
 #endif
 }
@@ -189,7 +190,7 @@ winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice UCaptureMachine::
 	{
 		const int code = e.code();
 		const winrt::hstring message = e.message();
-		UE_LOG(LogTemp, Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
+		UE_WC2D_LOG(Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
 		return nullptr;
 	}
 }
@@ -215,7 +216,7 @@ winrt::Windows::Graphics::Capture::GraphicsCaptureItem UCaptureMachine::CreateCa
 	{
 		const int code = e.code();
 		const winrt::hstring message = e.message();
-		UE_LOG(LogTemp, Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
+		UE_WC2D_LOG(Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
 		return nullptr;
 	}
 
@@ -261,7 +262,7 @@ void UCaptureMachine::OnFrameArrived(winrt::Windows::Graphics::Capture::Direct3D
 	{
 		const int code = e.code();
 		const winrt::hstring message = e.message();
-		UE_LOG(LogTemp, Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
+		UE_WC2D_LOG(Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
 	}
 }
 
@@ -351,7 +352,7 @@ void UCaptureMachine::UpdateTextureFromID3D11Texture2D(winrt::com_ptr<ID3D11Text
 	{
 		const int code = e.code();
 		const winrt::hstring message = e.message();
-		UE_LOG(LogTemp, Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
+		UE_WC2D_LOG(Error, TEXT("winrt::hresult_error %d %s"), code, message.c_str());
 	}
 }
 #endif
@@ -441,11 +442,11 @@ FWindowStatus UCaptureMachine::GetCurrentWindowStatus()
 		GetMonitorInfo(m_TargetMonitor, &Info);
 		FString title(Info.szDevice);
 
-		UE_LOG(LogTemp, Log, TEXT("%s"), *title);
-		UE_LOG(LogTemp, Log, TEXT("top=%d"), Info.rcWork.top);
-		UE_LOG(LogTemp, Log, TEXT("bottom=%d"), Info.rcWork.bottom);
-		UE_LOG(LogTemp, Log, TEXT("left=%d"), Info.rcWork.left);
-		UE_LOG(LogTemp, Log, TEXT("right=%d"), Info.rcWork.right);
+		UE_WC2D_LOG(Verbose, TEXT("%s"), Info.szDevice);
+		UE_WC2D_LOG(Verbose, TEXT("top=%d"), Info.rcWork.top);
+		UE_WC2D_LOG(Verbose, TEXT("bottom=%d"), Info.rcWork.bottom);
+		UE_WC2D_LOG(Verbose, TEXT("left=%d"), Info.rcWork.left);
+		UE_WC2D_LOG(Verbose, TEXT("right=%d"), Info.rcWork.right);
 		status.title = title;
 		status.top = Info.rcWork.top;
 		status.bottom = Info.rcWork.bottom;
@@ -465,11 +466,11 @@ FWindowStatus UCaptureMachine::GetCurrentWindowStatus()
 		::GetWindowRect(m_TargetWindow, &rect);
 
 		LONG_PTR style = GetWindowLongPtr(m_TargetWindow, GWL_STYLE);
-		//UE_LOG(LogTemp, Log, TEXT("%s"), windowTitle);
-		//UE_LOG(LogTemp, Log, TEXT("top=%d"), rect.top);
-		//UE_LOG(LogTemp, Log, TEXT("bottom=%d"), rect.bottom);
-		//UE_LOG(LogTemp, Log, TEXT("left=%d"), rect.left);
-		//UE_LOG(LogTemp, Log, TEXT("right=%d"), rect.right);
+		UE_WC2D_LOG(Verbose, TEXT("%s"), windowTitle);
+		UE_WC2D_LOG(Verbose, TEXT("top=%d"), rect.top);
+		UE_WC2D_LOG(Verbose, TEXT("bottom=%d"), rect.bottom);
+		UE_WC2D_LOG(Verbose, TEXT("left=%d"), rect.left);
+		UE_WC2D_LOG(Verbose, TEXT("right=%d"), rect.right);
 		status.title = title;
 		status.top = rect.top;
 		status.bottom = rect.bottom;
