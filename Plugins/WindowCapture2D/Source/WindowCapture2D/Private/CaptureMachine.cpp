@@ -25,18 +25,48 @@ void UCaptureMachine::Start()
 	try
 	{
 		m_TargetWindow = nullptr;
-		::EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
-			{
-				UCaptureMachine* my = (UCaptureMachine*)lParam;
-				return my->FindTargetWindow(hwnd);
-			}, (LPARAM)this);
-
-		if (!m_TargetWindow)
+		m_TargetMonitor = nullptr;
+		if (Properties.Target == ECaptureTarget::Window)
 		{
-			return;
+			::EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL
+				{
+					UCaptureMachine* my = reinterpret_cast<UCaptureMachine*>(lParam);
+					return my->FindTargetWindow(hwnd);
+				}, reinterpret_cast<LPARAM>(this));
+
+			if (!m_TargetWindow)
+			{
+				return;
+			}
+		}
+		else
+		{
+			struct FEnumData 
+			{
+				int index = 0;
+				UCaptureMachine* Machine = nullptr;
+			} EnumData = {0, this};
+
+			::EnumDisplayMonitors(NULL, NULL, [](HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData) -> BOOL
+				{
+					FEnumData* Data = reinterpret_cast<FEnumData*>(dwData);
+					if (Data->index == Data->Machine->Properties.CaptureTargetIndex)
+					{
+						Data->Machine->m_TargetMonitor = hMonitor;
+						return false;
+					}
+					Data->index++;
+					return true;
+
+				}, reinterpret_cast<LPARAM>(&EnumData));
+			if (!m_TargetMonitor)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Failed to find montior: %d"), EnumData.index);
+				return;
+			}
 		}
 
-		m_WinrtItem = CreateCaptureItem(m_TargetWindow);
+		m_WinrtItem = CreateCaptureItem();
 		if (!m_WinrtItem)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Failed to CreateCaptureItem()"));
@@ -164,14 +194,21 @@ winrt::Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice UCaptureMachine::
 	}
 }
 
-winrt::Windows::Graphics::Capture::GraphicsCaptureItem UCaptureMachine::CreateCaptureItem(HWND hwnd)
+winrt::Windows::Graphics::Capture::GraphicsCaptureItem UCaptureMachine::CreateCaptureItem()
 {
 	try
 	{
 		winrt::Windows::Foundation::IActivationFactory factory = winrt::get_activation_factory<winrt::Windows::Graphics::Capture::GraphicsCaptureItem>();
 		winrt::impl::com_ref<::IGraphicsCaptureItemInterop> interop = factory.as<::IGraphicsCaptureItemInterop>();
 		winrt::Windows::Graphics::Capture::GraphicsCaptureItem item{ nullptr };
-		winrt::check_hresult(interop->CreateForWindow(m_TargetWindow, winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(), reinterpret_cast<void**>(winrt::put_abi(item))));
+		if (m_TargetWindow)
+		{
+			winrt::check_hresult(interop->CreateForWindow(m_TargetWindow, winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(), reinterpret_cast<void**>(winrt::put_abi(item))));
+		}
+		else
+		{
+			winrt::check_hresult(interop->CreateForMonitor(m_TargetMonitor, winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(), reinterpret_cast<void**>(winrt::put_abi(item))));
+		}
 		return item;
 	}
 	catch (const winrt::hresult_error& e)
@@ -394,27 +431,52 @@ FWindowStatus UCaptureMachine::GetCurrentWindowStatus()
 	status.bottom = 0;
 	status.left = 0;
 	status.right = 0;
-	if (!m_TargetWindow) return status;
 
-	__wchar_t windowTitle[1024];
-	GetWindowText(m_TargetWindow, windowTitle, 1024);
-	FString title(windowTitle);
+	if (Properties.Target == ECaptureTarget::Monitor)
+	{
+		if (!m_TargetMonitor) return status;
 
-	RECT rect;
-	::GetWindowRect(m_TargetWindow, &rect);
+		MONITORINFOEX Info;
+		Info.cbSize = sizeof(MONITORINFOEX);
+		GetMonitorInfo(m_TargetMonitor, &Info);
+		FString title(Info.szDevice);
 
-	LONG_PTR style = GetWindowLongPtr(m_TargetWindow, GWL_STYLE);
-	//UE_LOG(LogTemp, Log, TEXT("%s"), windowTitle);
-	//UE_LOG(LogTemp, Log, TEXT("top=%d"), rect.top);
-	//UE_LOG(LogTemp, Log, TEXT("bottom=%d"), rect.bottom);
-	//UE_LOG(LogTemp, Log, TEXT("left=%d"), rect.left);
-	//UE_LOG(LogTemp, Log, TEXT("right=%d"), rect.right);
-	status.title = title;
-	status.top = rect.top;
-	status.bottom = rect.bottom;
-	status.left = rect.left;
-	status.right = rect.right;
-	return status;
+		UE_LOG(LogTemp, Log, TEXT("%s"), *title);
+		UE_LOG(LogTemp, Log, TEXT("top=%d"), Info.rcWork.top);
+		UE_LOG(LogTemp, Log, TEXT("bottom=%d"), Info.rcWork.bottom);
+		UE_LOG(LogTemp, Log, TEXT("left=%d"), Info.rcWork.left);
+		UE_LOG(LogTemp, Log, TEXT("right=%d"), Info.rcWork.right);
+		status.title = title;
+		status.top = Info.rcWork.top;
+		status.bottom = Info.rcWork.bottom;
+		status.left = Info.rcWork.left;
+		status.right = Info.rcWork.right;
+		return status;
+	}
+	else
+	{
+		if (!m_TargetWindow) return status;
+
+		__wchar_t windowTitle[1024];
+		GetWindowText(m_TargetWindow, windowTitle, 1024);
+		FString title(windowTitle);
+
+		RECT rect;
+		::GetWindowRect(m_TargetWindow, &rect);
+
+		LONG_PTR style = GetWindowLongPtr(m_TargetWindow, GWL_STYLE);
+		//UE_LOG(LogTemp, Log, TEXT("%s"), windowTitle);
+		//UE_LOG(LogTemp, Log, TEXT("top=%d"), rect.top);
+		//UE_LOG(LogTemp, Log, TEXT("bottom=%d"), rect.bottom);
+		//UE_LOG(LogTemp, Log, TEXT("left=%d"), rect.left);
+		//UE_LOG(LogTemp, Log, TEXT("right=%d"), rect.right);
+		status.title = title;
+		status.top = rect.top;
+		status.bottom = rect.bottom;
+		status.left = rect.left;
+		status.right = rect.right;
+		return status;
+	}
 }
 
 void UCaptureMachine::SetActiveWindow()
