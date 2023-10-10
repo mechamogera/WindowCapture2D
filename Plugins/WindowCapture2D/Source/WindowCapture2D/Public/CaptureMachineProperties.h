@@ -36,6 +36,13 @@ enum class ETitleMatchingWindowSearch : uint8
 	RegularExpression
 };
 
+UENUM(BlueprintType)
+enum class ECaptureTarget : uint8
+{
+	Window,
+	Monitor
+};
+
 
 
 USTRUCT(BlueprintType)
@@ -43,6 +50,12 @@ struct WINDOWCAPTURE2D_API FCaptureMachineProperties
 {
 public:
 	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WindowCapture2D)
+	ECaptureTarget Target = ECaptureTarget::Window;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WindowCapture2D)
+	int32 CaptureTargetIndex = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WindowCapture2D)
 	FString CaptureTargetTitle = TEXT("WindowCapture2D");
