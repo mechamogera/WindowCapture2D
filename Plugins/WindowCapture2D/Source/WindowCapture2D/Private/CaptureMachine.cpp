@@ -443,15 +443,15 @@ FWindowStatus UCaptureMachine::GetCurrentWindowStatus()
 		FString title(Info.szDevice);
 
 		UE_WC2D_LOG(Verbose, TEXT("%s"), Info.szDevice);
-		UE_WC2D_LOG(Verbose, TEXT("top=%d"), Info.rcWork.top);
-		UE_WC2D_LOG(Verbose, TEXT("bottom=%d"), Info.rcWork.bottom);
-		UE_WC2D_LOG(Verbose, TEXT("left=%d"), Info.rcWork.left);
-		UE_WC2D_LOG(Verbose, TEXT("right=%d"), Info.rcWork.right);
+		UE_WC2D_LOG(Verbose, TEXT("top=%d"), Info.rcMonitor.top);
+		UE_WC2D_LOG(Verbose, TEXT("bottom=%d"), Info.rcMonitor.bottom);
+		UE_WC2D_LOG(Verbose, TEXT("left=%d"), Info.rcMonitor.left);
+		UE_WC2D_LOG(Verbose, TEXT("right=%d"), Info.rcMonitor.right);
 		status.title = title;
-		status.top = Info.rcWork.top;
-		status.bottom = Info.rcWork.bottom;
-		status.left = Info.rcWork.left;
-		status.right = Info.rcWork.right;
+		status.top = Info.rcMonitor.top;
+		status.bottom = Info.rcMonitor.bottom;
+		status.left = Info.rcMonitor.left;
+		status.right = Info.rcMonitor.right;
 		return status;
 	}
 	else
