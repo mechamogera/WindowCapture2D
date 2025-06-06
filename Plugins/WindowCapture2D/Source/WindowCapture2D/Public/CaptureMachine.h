@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CaptureMachineProperties.h"
 #include "Containers/Ticker.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #if PLATFORM_WINDOWS
 #include "Windows/WindowsHWrapper.h"

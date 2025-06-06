@@ -9,6 +9,7 @@ public class WindowCapture2DTestEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "WindowCapture2DTest" } );
+		bOverrideBuildEnvironment = true;
+        ExtraModuleNames.AddRange( new string[] { "WindowCapture2DTest" } );
 	}
 }

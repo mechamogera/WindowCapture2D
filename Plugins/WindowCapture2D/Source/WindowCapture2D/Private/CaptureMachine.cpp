@@ -7,6 +7,7 @@
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
 #include "../Private/Utils/WCWorkerThread.h"
 #include "WindowCapture2DLog.h"
+#include "RHITypes.h"
 
 #if PLATFORM_WINDOWS
 #include <dwmapi.h>
